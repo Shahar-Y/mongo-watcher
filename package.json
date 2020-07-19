@@ -1,0 +1,24 @@
+{
+  "name": "mongo-watcher",
+  "version": "1.0.0",
+  "description": "Watching for changes in a mongodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shahar-Y/mongo-watcher.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shahar-Y/mongo-watcher/issues"
+  },
+  "homepage": "https://github.com/Shahar-Y/mongo-watcher#readme",
+  "dependencies": {
+    "@types/mongoose": "^5.7.32",
+    "mongoose": "^5.9.25"
+  }
+}
