@@ -38,7 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var mongoose = require("mongoose");
 var mongoose_1 = require("mongoose");
-var collectionName = 'File';
+var collectionName = 'files';
+var dbName = 'devDB';
 run()["catch"](function (error) { return console.error(error); });
 function run() {
     return __awaiter(this, void 0, void 0, function () {
@@ -46,12 +47,14 @@ function run() {
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: 
-                // Connect to the replica set
-                return [4 /*yield*/, mongoose.connect('mongodb://localhost:27017/devDB', { useNewUrlParser: true })];
+                case 0:
+                    console.log('initiating connection');
+                    // Connect to the replica set
+                    return [4 /*yield*/, mongoose.connect("mongodb://localhost:27017/" + dbName + "?replicaSet=rs0", { useNewUrlParser: true })];
                 case 1:
                     // Connect to the replica set
                     _a.sent();
+                    console.log('connection finished');
                     ObjectId = mongoose_1.Schema.Types.ObjectId;
                     fileSchema = new mongoose_1.Schema({
                         key: {
@@ -101,11 +104,25 @@ function run() {
                         }
                     });
                     fileModel = mongoose_1.model(collectionName, fileSchema);
-                    pipeline = [{ $match: { 'ns.db': 'devDB', 'ns.coll': collectionName } }];
+                    console.log('initiating watch');
+                    pipeline = [{ $match: { 'ns.db': dbName, 'ns.coll': collectionName } }];
                     fileModel.watch(pipeline).on('change', function (data) { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
-                            console.log('collection changed. document data:');
-                            console.log(data.fullDocument);
+                            console.log('******************************************');
+                            console.log("an " + data.operationType + " operation occured in the database: " + data.ns.db + ",\n                     in the collection: " + data.ns.coll + ".");
+                            console.log("item id: " + data.documentKey._id);
+                            console.log("change info:");
+                            switch (data.operationType) {
+                                case 'update':
+                                    console.log(data.updateDescription);
+                                    break;
+                                case 'insert':
+                                    console.log(data.fullDocument);
+                                    break;
+                                default:
+                                    console.log(data);
+                            }
+                            console.log('');
                             return [2 /*return*/];
                         });
                     }); });

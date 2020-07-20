@@ -1,14 +1,20 @@
-import * as mongoose from 'mongoose';
+import mongoose = require("mongoose");
 import { Schema, model, Document } from 'mongoose';
 
-const collectionName: string = 'File';
+// to initiate repicaSet: 
+// 1. `sudo mongod --replSet rs0`
+// 2. `mongo`
+// 3. >`rs.initiate()`
+
+const collectionName: string = 'files';
+const dbName: string = 'devDB';
 run().catch(error => console.error(error));
 
 async function run() {
-
+    console.log('initiating connection');
     // Connect to the replica set
-    await mongoose.connect('mongodb://localhost:27017/devDB', { useNewUrlParser: true });
-
+    await mongoose.connect(`mongodb://localhost:27017/${dbName}?replicaSet=rs0`, { useNewUrlParser: true });
+    console.log('connection finished');
 
     const ObjectId = Schema.Types.ObjectId;
 
@@ -66,13 +72,28 @@ async function run() {
     const fileModel = model(collectionName, fileSchema);
 
 
-
+    
+    console.log('initiating watch');
     // The first argument to `watch()` is an aggregation pipeline. 
     // This pipeline makes sure we only get notified of changes on the 
     // collectionName collection.
-    const pipeline = [{ $match: { 'ns.db': 'devDB', 'ns.coll': collectionName } }];
+    const pipeline = [{ $match: { 'ns.db': dbName, 'ns.coll': collectionName } }];
     fileModel.watch(pipeline).on('change', async(data) => {
-        console.log('collection changed. document data:');
-        console.log((<any>data).fullDocument);
+        console.log('******************************************');
+        console.log(`an ${(<any>data).operationType} operation occured in the database: ${(<any>data).ns.db},
+                     in the collection: ${(<any>data).ns.coll}.`);
+        console.log(`item id: ${(<any>data).documentKey._id}`);
+        console.log(`change info:`);
+        switch((<any>data).operationType) {
+            case 'update':
+                console.log((<any>data).updateDescription)
+                break;
+            case 'insert':
+                console.log((<any>data).fullDocument)
+                break;
+            default:
+                console.log((<any>data));
+        }
+        console.log('')
     })
 }
