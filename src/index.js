@@ -38,6 +38,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var mongoose = require("mongoose");
 var mongoose_1 = require("mongoose");
+// to initiate repicaSet: 
+// 1. `sudo mongod --replSet rs0`
+// 2. `mongo`
+// 3. >`rs.initiate()`
 var collectionName = 'files';
 var dbName = 'devDB';
 run()["catch"](function (error) { return console.error(error); });
