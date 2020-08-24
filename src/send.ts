@@ -1,5 +1,11 @@
 import * as amqp from 'amqplib/callback_api';
-// var amqp = require('amqplib/callback_api');
+
+let myChannel : amqp.Channel = null;
+
+export const queueName : string = 'myQueueName';
+export const publishToQueue = async (queueName : string, data: any) => {
+    myChannel.sendToQueue(queueName, new Buffer(data), {persistent: true});
+}
 
 console.log('init connect amqp');
 amqp.connect('amqp://localhost', function (error0: Error, connection: amqp.Connection) {
@@ -15,22 +21,22 @@ amqp.connect('amqp://localhost', function (error0: Error, connection: amqp.Conne
             console.log(error1);
             throw error1;
         }
+        myChannel = channel;
 
         console.log('createChannel finished!');
-        var queue: string = 'hello';
         var msg: string = 'Hello world';
 
-        channel.assertQueue(queue, {
+        channel.assertQueue(queueName, {
             durable: false
         });
 
-        channel.sendToQueue(queue, Buffer.from(msg));
+        channel.sendToQueue(queueName, Buffer.from(msg));
         console.log(" [x] Sent %s", msg);
+
     });
 
-    setTimeout(function () {
-        connection.close();
-        process.exit(0)
-    }, 500);
+    // setTimeout(function () {
+    //     connection.close();
+    //     process.exit(0)
+    // }, 500);
 });
-

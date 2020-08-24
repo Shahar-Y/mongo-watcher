@@ -1,5 +1,6 @@
 import mongoose = require("mongoose");
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
+import * as send from './send';
 
 const collectionName: string = 'files';
 const dbName: string = 'devDB';
@@ -66,8 +67,6 @@ async function run() {
 
     const fileModel = model(collectionName, fileSchema);
 
-
-    
     console.log('initiating watch');
     // The first argument to `watch()` is an aggregation pipeline. 
     // This pipeline makes sure we only get notified of changes on the 
@@ -76,19 +75,23 @@ async function run() {
     fileModel.watch(pipeline).on('change', async(data) => {
         console.log('******************************************');
         console.log(`an ${(<any>data).operationType} operation occured in the database: ${(<any>data).ns.db},
-                     in the collection: ${(<any>data).ns.coll}.`);
+                            in the collection: ${(<any>data).ns.coll}.`);
         console.log(`item id: ${(<any>data).documentKey._id}`);
-        console.log(`change info:`);
-        switch((<any>data).operationType) {
+
+        let operation : string = (<any>data).operationType;
+        let dataString : string = 'NO_DATA';
+        switch(operation) {
             case 'update':
-                console.log((<any>data).updateDescription)
+                dataString = JSON.stringify((<any>data).updateDescription);
                 break;
             case 'insert':
-                console.log((<any>data).fullDocument)
+                dataString = JSON.stringify((<any>data).fullDocument);
                 break;
             default:
-                console.log((<any>data));
+                console.log(`an unknown operation occured: ${operation}`);
         }
+
+        send.publishToQueue(send.queueName, `operation: ${operation}, dataString: ${dataString}`);
         console.log('')
     })
 }
