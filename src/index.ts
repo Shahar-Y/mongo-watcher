@@ -1,11 +1,6 @@
 import mongoose = require("mongoose");
 import { Schema, model, Document } from 'mongoose';
 
-// to initiate repicaSet: 
-// 1. `sudo mongod --replSet rs0`
-// 2. `mongo`
-// 3. >`rs.initiate()`
-
 const collectionName: string = 'files';
 const dbName: string = 'devDB';
 run().catch(error => console.error(error));
