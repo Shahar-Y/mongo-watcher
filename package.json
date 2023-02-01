@@ -21,6 +21,6 @@
   "dependencies": {
     "@types/mongodb": "^3.5.25",
     "@types/mongoose": "^5.7.32",
-    "mongoose": "^5.9.25"
+    "mongoose": "^5.13.15"
   }
 }
